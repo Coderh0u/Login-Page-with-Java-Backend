@@ -10,17 +10,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.test.postgresql.model.EnumRole;
+import com.test.postgresql.model.Roles;
 import com.test.postgresql.model.Users;
+import com.test.postgresql.repository.RolesRepo;
 import com.test.postgresql.repository.UsersRepo;
 
 @RestController
 @RequestMapping
 public class User {
   private final UsersRepo userRepo;
+  private final RolesRepo rolesRepo;
 
   // inject User repository here
-  public User(UsersRepo userRepo) {
+  public User(UsersRepo userRepo, RolesRepo rolesRepo) {
     this.userRepo = userRepo;
+    this.rolesRepo = rolesRepo;
   }
 
   @GetMapping("/login")
@@ -41,7 +46,8 @@ public class User {
   }
 
   @PutMapping("/register")
-  public ResponseEntity<?> addUser(@RequestParam String username, @RequestParam String password) {
+  public ResponseEntity<?> addUser(@RequestParam String username, @RequestParam String password,
+      @RequestParam String role) {
     // check for repeated username
     Optional<com.test.postgresql.model.Users> repeatedUser = userRepo.findByUsername(username);
     if (repeatedUser.isPresent()) {
@@ -50,10 +56,13 @@ public class User {
     try {
       String salt = BCrypt.gensalt(12);
       String hashPwd = BCrypt.hashpw(password, salt);
+      Roles selectedRole = rolesRepo.findByRole(EnumRole.valueOf(role));
+     
 
       Users newUser = new Users();
       newUser.setUsername(username);
       newUser.setHashPwd(hashPwd);
+      newUser.setRole(selectedRole);
       userRepo.save(newUser);
 
       return ResponseEntity.ok("successfully added user");
