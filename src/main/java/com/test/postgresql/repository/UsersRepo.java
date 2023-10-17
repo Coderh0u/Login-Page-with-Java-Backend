@@ -8,6 +8,6 @@ import com.test.postgresql.model.Users;
 
 
 public interface UsersRepo extends JpaRepository<Users, UUID>{
-  Optional<Users> findByUsernameAndPassword(String username, String password);
+  Optional<Users> findByUsernameAndHashPwd(String username, String hashPwd);
   Optional<Users> findByUsername(String username);
 }

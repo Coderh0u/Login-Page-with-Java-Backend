@@ -2,6 +2,7 @@ package com.test.postgresql.controller;
 
 import java.util.Optional;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -23,35 +24,47 @@ public class User {
   }
 
   @GetMapping("/login")
-  public ResponseEntity getUserDetails(@RequestParam String username, @RequestParam String password) {
-    Optional<com.test.postgresql.model.Users> user = userRepo.findByUsernameAndPassword(username, password);
-
+  public ResponseEntity<?> getUserDetails(@RequestParam String username, @RequestParam String password) {
+    Optional<com.test.postgresql.model.Users> user = userRepo.findByUsername(username);
     if (user.isPresent()) {
-      return ResponseEntity.ok(user.get());
+      com.test.postgresql.model.Users foundUser = user.get();
+      String storedHash = foundUser.getHashPwd();
+      Boolean passwordMatch = BCrypt.checkpw(password, storedHash);
+      if (passwordMatch) {
+        return ResponseEntity.ok("login successful");
+      } else {
+        return ResponseEntity.status(401).body("wrong password");
+      }
     } else {
-      return ResponseEntity.notFound().build();
+      return ResponseEntity.status(404).body("user not found");
     }
   }
 
   @PutMapping("/register")
-  public ResponseEntity addUser(@RequestParam String username, @RequestParam String password) {
+  public ResponseEntity<?> addUser(@RequestParam String username, @RequestParam String password) {
     // check for repeated username
     Optional<com.test.postgresql.model.Users> repeatedUser = userRepo.findByUsername(username);
     if (repeatedUser.isPresent()) {
       return ResponseEntity.status(409).body("username already in use");
     }
+    try {
+      String salt = BCrypt.gensalt(12);
+      String hashPwd = BCrypt.hashpw(password, salt);
 
-    Users newUser = new Users();
-    newUser.setUsername(username);
-    newUser.setPassword(password);
-    userRepo.save(newUser);
+      Users newUser = new Users();
+      newUser.setUsername(username);
+      newUser.setHashPwd(hashPwd);
+      userRepo.save(newUser);
 
-    return ResponseEntity.ok("successfully added user");
+      return ResponseEntity.ok("successfully added user");
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("registration failed");
+    }
   }
 
   // testing purposes
   @GetMapping("/all")
-  public ResponseEntity getAllUsers() {
+  public ResponseEntity<?> getAllUsers() {
     return ResponseEntity.ok(this.userRepo.findAll());
   }
 }

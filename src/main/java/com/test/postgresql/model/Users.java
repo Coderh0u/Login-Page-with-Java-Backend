@@ -17,15 +17,24 @@ public class Users {
   // other table column names
   private String username;
 
-  private String password;
+  private String hashPwd;
 
   public Users() {
   }
 
-  public Users(UUID uuid, String username, String password) {
+  public Users(UUID uuid, String username, String hashPwd) {
     this.uuid = uuid;
     this.username = username;
-    this.password = password;
+    this.hashPwd = hashPwd;
+
+  }
+
+  public String getHashPwd() {
+    return hashPwd;
+  }
+
+  public void setHashPwd(String hashPwd) {
+    this.hashPwd = hashPwd;
   }
 
   public UUID getUuid() {
@@ -36,10 +45,6 @@ public class Users {
     return username;
   }
 
-  public String getPassword() {
-    return password;
-  }
-
   public void setUuid(UUID uuid) {
     this.uuid = uuid;
   }
@@ -48,7 +53,4 @@ public class Users {
     this.username = username;
   }
 
-  public void setPassword(String password) {
-    this.password = password;
-  }
 }
