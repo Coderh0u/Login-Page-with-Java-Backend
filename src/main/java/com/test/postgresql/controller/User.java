@@ -2,7 +2,10 @@ package com.test.postgresql.controller;
 
 import java.util.Optional;
 
+import javax.crypto.SecretKey;
+
 import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -15,12 +18,17 @@ import com.test.postgresql.model.Roles;
 import com.test.postgresql.model.Users;
 import com.test.postgresql.repository.RolesRepo;
 import com.test.postgresql.repository.UsersRepo;
+import com.test.postgresql.services.AuthResponse;
+
+import io.jsonwebtoken.Jwts;
 
 @RestController
 @RequestMapping
 public class User {
   private final UsersRepo userRepo;
   private final RolesRepo rolesRepo;
+  @Autowired
+  private SecretKey secretKey;
 
   // inject User repository here
   public User(UsersRepo userRepo, RolesRepo rolesRepo) {
@@ -36,7 +44,11 @@ public class User {
       String storedHash = foundUser.getHashPwd();
       Boolean passwordMatch = BCrypt.checkpw(password, storedHash);
       if (passwordMatch) {
-        return ResponseEntity.ok("login successful");
+        String userRole = foundUser.getRole().toString();
+        // introduce JWTs here
+        String accessToken = Jwts.builder().content(username, userRole).signWith(secretKey).compact();
+        AuthResponse authResponse = new AuthResponse(accessToken, "login successful");
+        return ResponseEntity.ok(authResponse);
       } else {
         return ResponseEntity.status(401).body("wrong password");
       }
@@ -57,7 +69,6 @@ public class User {
       String salt = BCrypt.gensalt(12);
       String hashPwd = BCrypt.hashpw(password, salt);
       Roles selectedRole = rolesRepo.findByRole(EnumRole.valueOf(role));
-     
 
       Users newUser = new Users();
       newUser.setUsername(username);
