@@ -15,10 +15,12 @@ const Login = (props: any) => {
     const res = await fetchData("/login", "GET", undefined, undefined, {
       username,
       password,
+      accessToken: props.accessToken,
     });
     if (res.ok) {
       props.setUser(res.data.username);
       props.setUserRole(res.data.userRole);
+      props.setAccessToken(res.data.accessToken);
       props.setShowLogin(false);
       props.setLoginStatus(true);
     } else {

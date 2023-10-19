@@ -22,7 +22,6 @@ const Register = (props: any) => {
 
     if (res.ok) {
       setResponseMsg(res.data.message);
-    
     } else {
       setErrorMsg(res.data);
     }

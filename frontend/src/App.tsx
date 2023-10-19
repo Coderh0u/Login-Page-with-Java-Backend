@@ -11,21 +11,25 @@ function App() {
   const [showRegister, setShowRegister] = useState(false);
   const [user, setUser] = useState("");
   const [userRole, setUserRole] = useState("");
+  const [accessToken, setAccessToken] = useState("");
   const [loginStatus, setLoginStatus] = useState(false);
   const [allUsers, setAllUsers] = useState([]);
 
-  const getAllUsers = async () => {
-    const res = await fetchData("/all", "GET");
-    if (res.ok) {
-      setAllUsers(res.data);
-    }
-  };
+  const logOutClick = async () => {};
   return (
     <>
       {loginStatus ? (
         <>
           <h1>Hi, Welcome {user}</h1>
           <h2>Role: {userRole}</h2>
+          <button
+            onClick={() => {
+              setShowLogin(true);
+              console.log("login clicked");
+            }}
+          >
+            Log Out
+          </button>
         </>
       ) : (
         <>
@@ -54,6 +58,8 @@ function App() {
           setLoginStatus={setLoginStatus}
           setUser={setUser}
           setUserRole={setUserRole}
+          accessToken={accessToken}
+          setAccessToken={setAccessToken}
         ></Login>
       )}
       {showRegister && <Register setShowRegister={setShowRegister}></Register>}

@@ -6,6 +6,5 @@ import com.test.postgresql.model.EnumRole;
 import com.test.postgresql.model.Roles;
 
 public interface RolesRepo extends JpaRepository<Roles, EnumRole> {
-
   Roles findByRole(EnumRole role);
 }

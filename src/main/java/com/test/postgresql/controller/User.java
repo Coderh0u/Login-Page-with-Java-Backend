@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-// import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,8 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.test.postgresql.model.EnumRole;
 import com.test.postgresql.model.Roles;
 import com.test.postgresql.model.Users;
+import com.test.postgresql.model.AccessTokens;
 import com.test.postgresql.repository.RolesRepo;
 import com.test.postgresql.repository.UsersRepo;
+import com.test.postgresql.repository.TokensRepo;
 import com.test.postgresql.services.AuthResponse;
 
 import io.jsonwebtoken.Jwts;
@@ -30,17 +31,20 @@ import io.jsonwebtoken.Jwts;
 public class User {
   private final UsersRepo userRepo;
   private final RolesRepo rolesRepo;
+  private final TokensRepo tokensRepo;
+
   @Autowired
   private SecretKey secretKey;
 
-  // inject User repository here
-  public User(UsersRepo userRepo, RolesRepo rolesRepo) {
+  public User(UsersRepo userRepo, RolesRepo rolesRepo, TokensRepo tokensRepo) {
     this.userRepo = userRepo;
     this.rolesRepo = rolesRepo;
+    this.tokensRepo = tokensRepo;
   }
 
   @GetMapping("/login")
-  public ResponseEntity<?> getUserDetails(@RequestParam String username, @RequestParam String password) {
+  public ResponseEntity<?> getUserDetails(@RequestParam String username, @RequestParam String password,
+      @RequestParam String token) {
     Optional<com.test.postgresql.model.Users> user = userRepo.findByUsername(username);
     if (user.isPresent()) {
       com.test.postgresql.model.Users foundUser = user.get();
@@ -48,11 +52,17 @@ public class User {
       Boolean passwordMatch = BCrypt.checkpw(password, storedHash);
       if (passwordMatch) {
         String userRole = foundUser.getRoleString();
-        // introduce JWTs here
+
+        // check if logged out
+        Optional<AccessTokens> blackListedToken = tokensRepo.findByToken(token);
+        if (blackListedToken.isPresent()) {
+          AuthResponse authResponse = new AuthResponse("Forbidden user");
+          return ResponseEntity.status(401).body(authResponse);
+        }
+
+        // introduce new JWT here
         String accessToken = Jwts.builder().content(username, userRole).signWith(secretKey).compact();
-        // new library of JJWT may not be compatible with npm version of JWT,
-        // nevertheless, included it here for possibility of future use
-        // so I'm passing in the username and role as a string
+
         AuthResponse authResponse = new AuthResponse(accessToken, "login successful", username, userRole);
         return ResponseEntity.ok(authResponse);
       } else {
@@ -90,6 +100,17 @@ public class User {
       AuthResponse authResponse = new AuthResponse("registeration failed");
       return ResponseEntity.status(500).body(authResponse);
     }
+  }
+
+  // logout
+  @PutMapping("/logout")
+  public ResponseEntity<?> logout(@RequestParam String token) {
+    AccessTokens newBlackListToken = new AccessTokens();
+    newBlackListToken.setToken(token);
+    tokensRepo.save(newBlackListToken);
+    
+    AuthResponse authResponse = new AuthResponse("log out successful");
+    return ResponseEntity.ok(authResponse);
   }
 
   // testing purposes
