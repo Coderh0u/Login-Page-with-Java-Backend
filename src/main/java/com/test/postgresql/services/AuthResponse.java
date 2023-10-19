@@ -44,4 +44,8 @@ public class AuthResponse {
     this.username = username;
     this.userRole = userRole;
   }
+
+  public AuthResponse(String message) {
+    this.message = message;
+  }
 }

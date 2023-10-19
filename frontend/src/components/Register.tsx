@@ -1,33 +1,31 @@
-import React, { useContext, useState } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom";
 import useFetch from "../custom_hooks/useFetch";
 import styles from "./Modal.module.css";
 
 const fetchData = useFetch();
 
-const Login = (props: any) => {
-  const [username, setUsername] = useState("user2");
-  const [password, setPassword] = useState("password2");
-  const [accessToken, setAccessToken] = useState("");
+const Register = (props: any) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
+  const [role, setRole] = useState("");
+  const [responseMsg, setResponseMsg] = useState("");
   const authRoot = document.querySelector<HTMLDivElement>("#modal-root")!;
 
-  const loginClick = async () => {
-    const res = await fetchData("/login", "GET", undefined, undefined, {
+  const registerClick = async () => {
+    const res = await fetchData("/register", "PUT", undefined, undefined, {
       username,
       password,
+      role,
     });
     if (res.ok) {
+      setResponseMsg(res.data);
       console.log(res.data);
-      props.setUser(res.data.username);
-      props.setUserRole(res.data.userRole);
-      props.setShowLogin(false);
-      props.setLoginStatus(true);
     } else {
       setErrorMsg(res.data);
     }
   };
-
   return (
     <>
       {ReactDOM.createPortal(
@@ -36,7 +34,7 @@ const Login = (props: any) => {
             <button
               className={styles.closeButton}
               onClick={() => {
-                props.setShowLogin(false);
+                props.setShowRegister(false);
               }}
             >
               <img
@@ -65,21 +63,35 @@ const Login = (props: any) => {
                     setErrorMsg("");
                   }}
                 ></input>
+                <div>Choose an account type:</div>
+                <select
+                  onChange={(e) => {
+                    setRole(e.target.value);
+                  }}
+                >
+                  <option value="USER">User</option>
+                  <option value="MANAGER">Manager</option>
+                </select>
               </div>
               <hr />
               <hr />
               <button
                 onClick={() => {
-                  loginClick();
+                  registerClick();
                 }}
               >
-                Log In
+                Register
               </button>
               {errorMsg ? (
                 <p style={{ color: "red", margin: "0" }}>{errorMsg}</p>
               ) : (
                 <div style={{ height: "36px", margin: "0" }}></div>
               )}
+              {/* {responseMsg ? (
+                <p style={{ color: "green", margin: "0" }}>{responseMsg}</p>
+              ) : (
+                <div style={{ height: "36px", margin: "0" }}></div>
+              )} */}
               <br />
             </div>
           </div>
@@ -90,4 +102,4 @@ const Login = (props: any) => {
   );
 };
 
-export default Login;
+export default Register;

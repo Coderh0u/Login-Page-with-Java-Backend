@@ -56,10 +56,12 @@ public class User {
         AuthResponse authResponse = new AuthResponse(accessToken, "login successful", username, userRole);
         return ResponseEntity.ok(authResponse);
       } else {
-        return ResponseEntity.status(401).body("wrong password");
+        AuthResponse authResponse = new AuthResponse("wrong password");
+        return ResponseEntity.status(401).body(authResponse);
       }
     } else {
-      return ResponseEntity.status(404).body("user not found");
+      AuthResponse authResponse = new AuthResponse("user not found");
+      return ResponseEntity.status(404).body(authResponse);
     }
   }
 
@@ -69,7 +71,8 @@ public class User {
     // check for repeated username
     Optional<com.test.postgresql.model.Users> repeatedUser = userRepo.findByUsername(username);
     if (repeatedUser.isPresent()) {
-      return ResponseEntity.status(409).body("username already in use");
+      AuthResponse authResponse = new AuthResponse("username already in use");
+      return ResponseEntity.status(409).body(authResponse);
     }
     try {
       String salt = BCrypt.gensalt(12);
@@ -81,10 +84,11 @@ public class User {
       newUser.setHashPwd(hashPwd);
       newUser.setRole(selectedRole);
       userRepo.save(newUser);
-
-      return ResponseEntity.ok("successfully added user");
+      AuthResponse authResponse = new AuthResponse("successfully added user");
+      return ResponseEntity.ok(authResponse);
     } catch (Exception e) {
-      return ResponseEntity.status(500).body("registration failed");
+      AuthResponse authResponse = new AuthResponse("registeration failed");
+      return ResponseEntity.status(500).body(authResponse);
     }
   }
 

@@ -34,13 +34,12 @@ const useFetch = () => {
 
     if (res.ok) {
       if (data.status === "error") {
-        returnValue = { ok: false, data: data.msg };
+        returnValue = { ok: false, data: data.message };
       } else {
         returnValue = { ok: true, data };
       }
     } else {
-      const errorMsg = await res.text();
-      returnValue = { ok: false, data: errorMsg };
+      returnValue = { ok: false, data: data.message };
     }
 
     return returnValue;

@@ -1,7 +1,10 @@
 import { useState } from "react";
 import "./App.css";
 import Login from "./components/Login";
-// import { Route, Routes } from "react-router-dom";
+import Register from "./components/Register";
+import useFetch from "./custom_hooks/useFetch";
+
+const fetchData = useFetch();
 
 function App() {
   const [showLogin, setShowLogin] = useState(false);
@@ -9,11 +12,19 @@ function App() {
   const [user, setUser] = useState("");
   const [userRole, setUserRole] = useState("");
   const [loginStatus, setLoginStatus] = useState(false);
+  const [allUsers, setAllUsers] = useState([]);
+
+  const getAllUsers = async () => {
+    const res = await fetchData("/all", "GET");
+    if (res.ok) {
+      setAllUsers(res.data);
+    }
+  };
   return (
     <>
       {loginStatus ? (
         <>
-          <h1>Hi, Welcome{user}</h1>
+          <h1>Hi, Welcome {user}</h1>
           <h2>Role: {userRole}</h2>
         </>
       ) : (
@@ -45,12 +56,7 @@ function App() {
           setUserRole={setUserRole}
         ></Login>
       )}
-      {/* {showLogin && (
-        <Login
-          setShowLogin={setShowLogin}
-          setAccessToken={setAccessToken}
-        ></Login>
-      )} */}
+      {showRegister && <Register setShowRegister={setShowRegister}></Register>}
     </>
   );
 }

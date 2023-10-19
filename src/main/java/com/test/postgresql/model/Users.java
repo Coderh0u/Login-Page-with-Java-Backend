@@ -22,7 +22,7 @@ public class Users {
   @ManyToOne
   @JoinColumn(name = "role")
   private Roles role;
-  private String roleString;
+  // private String roleString;
 
   public Users() {
   }
