@@ -9,7 +9,7 @@ const Register = (props: any) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
-  const [role, setRole] = useState("");
+  const [role, setRole] = useState("USER");
   const [responseMsg, setResponseMsg] = useState("");
   const authRoot = document.querySelector<HTMLDivElement>("#modal-root")!;
 
@@ -19,9 +19,10 @@ const Register = (props: any) => {
       password,
       role,
     });
+
     if (res.ok) {
-      setResponseMsg(res.data);
-      console.log(res.data);
+      setResponseMsg(res.data.message);
+    
     } else {
       setErrorMsg(res.data);
     }
@@ -87,11 +88,11 @@ const Register = (props: any) => {
               ) : (
                 <div style={{ height: "36px", margin: "0" }}></div>
               )}
-              {/* {responseMsg ? (
+              {responseMsg ? (
                 <p style={{ color: "green", margin: "0" }}>{responseMsg}</p>
               ) : (
                 <div style={{ height: "36px", margin: "0" }}></div>
-              )} */}
+              )}
               <br />
             </div>
           </div>

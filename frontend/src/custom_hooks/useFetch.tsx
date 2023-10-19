@@ -23,6 +23,8 @@ const useFetch = () => {
       headers.Authorization = "Bearer" + token;
     }
 
+    // console.log(url.toString());
+
     const res = await fetch(url.toString(), {
       method,
       headers,

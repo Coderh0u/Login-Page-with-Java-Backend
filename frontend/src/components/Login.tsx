@@ -6,9 +6,8 @@ import styles from "./Modal.module.css";
 const fetchData = useFetch();
 
 const Login = (props: any) => {
-  const [username, setUsername] = useState("user2");
-  const [password, setPassword] = useState("password2");
-  const [accessToken, setAccessToken] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMsg, setErrorMsg] = useState("");
   const authRoot = document.querySelector<HTMLDivElement>("#modal-root")!;
 
@@ -18,7 +17,6 @@ const Login = (props: any) => {
       password,
     });
     if (res.ok) {
-      console.log(res.data);
       props.setUser(res.data.username);
       props.setUserRole(res.data.userRole);
       props.setShowLogin(false);
