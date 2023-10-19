@@ -1,5 +1,9 @@
 package com.test.postgresql.model;
 
+import java.sql.Timestamp;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -12,6 +16,9 @@ public class AccessTokens {
   private Long id;
 
   private String token;
+
+  @CreationTimestamp
+  private Timestamp createdTimestamp;
 
   public AccessTokens() {
   }
