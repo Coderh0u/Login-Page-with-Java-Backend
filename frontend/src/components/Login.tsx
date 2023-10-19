@@ -1,31 +1,32 @@
 import React, { useContext, useState } from "react";
 import ReactDOM from "react-dom";
 import useFetch from "../custom_hooks/useFetch";
-// import AuthContext from "../context/auth";
+import jwt_decode from "jwt-decode";
 import styles from "./Modal.module.css";
 
 const fetchData = useFetch();
 
 const Login = (props: any) => {
   // const auth = useContext(AuthContext);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("user2");
+  const [password, setPassword] = useState("password2");
+  const [accessToken, setAccessToken] = useState("");
   const [error, setError] = useState("");
   const authRoot = document.querySelector<HTMLDivElement>("#modal-root")!;
 
   const loginClick = async () => {
-    try {
-      const res = await fetchData("/login", "GET", undefined, undefined, {
-        username,
-        password,
-      });
-      if (res.ok) {
-        console.log(res);
-      } else {
-        console.log(res);
-      }
-    } catch (error) {
-      console.error("error");
+    const res = await fetchData("/login", "GET", undefined, undefined, {
+      username,
+      password,
+    });
+    if (res.ok) {
+      console.log(res.data);
+      props.setUser(res.data.username);
+      props.setUserRole(res.data.userRole);
+      props.setShowLogin(false);
+      props.setLoginStatus(true);
+    } else {
+      console.log(res.data.errorMsg);
     }
   };
 
@@ -72,7 +73,8 @@ const Login = (props: any) => {
                   }}
                 ></input>
               </div>
-
+              <hr />
+              <hr />
               <button
                 onClick={() => {
                   loginClick();
@@ -80,16 +82,8 @@ const Login = (props: any) => {
               >
                 Log In
               </button>
+              {error ? <div>{error}</div> : ""}
               <br />
-
-              <button
-                onClick={() => {
-                  props.setShowLogin(false);
-                  props.setShowRegister(true);
-                }}
-              >
-                Register
-              </button>
             </div>
           </div>
         </div>,

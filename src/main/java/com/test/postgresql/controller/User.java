@@ -47,10 +47,13 @@ public class User {
       String storedHash = foundUser.getHashPwd();
       Boolean passwordMatch = BCrypt.checkpw(password, storedHash);
       if (passwordMatch) {
-        String userRole = foundUser.getRole().toString();
+        String userRole = foundUser.getRoleString();
         // introduce JWTs here
         String accessToken = Jwts.builder().content(username, userRole).signWith(secretKey).compact();
-        AuthResponse authResponse = new AuthResponse(accessToken, "login successful");
+        // new library of JJWT may not be compatible with npm version of JWT,
+        // nevertheless, included it here for possibility of future use
+        // so I'm passing in the username and role as a string
+        AuthResponse authResponse = new AuthResponse(accessToken, "login successful", username, userRole);
         return ResponseEntity.ok(authResponse);
       } else {
         return ResponseEntity.status(401).body("wrong password");

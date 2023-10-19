@@ -16,12 +16,8 @@ public class Roles {
   @Enumerated(EnumType.STRING)
   private EnumRole role;
 
-  public EnumRole getRole() {
-    return role;
-  }
-
-  public void setRole(EnumRole role) {
-    this.role = role;
+  public String getRoleName() {
+    return role.name();
   }
 
   public Roles() {

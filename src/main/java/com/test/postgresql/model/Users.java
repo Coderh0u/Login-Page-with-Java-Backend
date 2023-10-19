@@ -22,6 +22,7 @@ public class Users {
   @ManyToOne
   @JoinColumn(name = "role")
   private Roles role;
+  private String roleString;
 
   public Users() {
   }
@@ -63,4 +64,9 @@ public class Users {
   public void setRole(Roles role) {
     this.role = role;
   }
+
+  public String getRoleString() {
+    return role.getRoleName();
+  }
+
 }
