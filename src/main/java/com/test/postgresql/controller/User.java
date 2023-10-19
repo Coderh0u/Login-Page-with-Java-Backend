@@ -1,9 +1,13 @@
 package com.test.postgresql.controller;
 
 import java.util.Optional;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.HashMap;
 
 import javax.crypto.SecretKey;
 
+import org.aspectj.util.SoftHashMap;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -61,7 +65,13 @@ public class User {
         }
 
         // introduce new JWT here
-        String accessToken = Jwts.builder().content(username, userRole).signWith(secretKey).compact();
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        String timeString = timestamp.toString();
+        HashMap<String, Object> jsonData = new HashMap<>();
+        jsonData.put("username", username);
+        jsonData.put("userRole", userRole);
+        jsonData.put("createdAt", timeString);
+        String accessToken = Jwts.builder().claims(jsonData).signWith(secretKey).compact();
 
         AuthResponse authResponse = new AuthResponse(accessToken, "login successful", username, userRole);
         return ResponseEntity.ok(authResponse);
@@ -108,14 +118,16 @@ public class User {
     AccessTokens newBlackListToken = new AccessTokens();
     newBlackListToken.setToken(token);
     tokensRepo.save(newBlackListToken);
-    
+
     AuthResponse authResponse = new AuthResponse("log out successful");
     return ResponseEntity.ok(authResponse);
   }
 
   // testing purposes
-  @GetMapping("/all")
+  @GetMapping("/allUsers")
   public ResponseEntity<?> getAllUsers() {
-    return ResponseEntity.ok(this.userRepo.findAll());
+    Roles selectedRole = rolesRepo.findByRole(EnumRole.valueOf("USER"));
+    List<Users> users = userRepo.findByRole(selectedRole);
+    return ResponseEntity.ok(users);
   }
 }

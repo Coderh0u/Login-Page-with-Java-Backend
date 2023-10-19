@@ -9,20 +9,17 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 
-// how to tell spring that this is an entity from db
 @Entity
 public class Users {
-  @Id // mark as primary key here
+  @Id 
   @GeneratedValue(strategy = GenerationType.AUTO)
-  private UUID uuid; // make primary key as uuid
+  private UUID uuid; 
 
-  // other table column names
   private String username;
   private String hashPwd;
   @ManyToOne
   @JoinColumn(name = "role")
   private Roles role;
-  // private String roleString;
 
   public Users() {
   }
