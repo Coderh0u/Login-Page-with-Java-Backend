@@ -7,19 +7,26 @@ const useFetch = () => {
   const fetchData = async (
     endpoint: string,
     method: string,
-    params?: object,
-    token?: string
+    body?: object | null,
+    token?: string | null,
+    queryParams?: Record<string, string>
   ) => {
-    const res = await fetch(import.meta.env.VITE_SERVER + endpoint, {
+    const url = new URL(import.meta.env.VITE_SERVER + endpoint);
+    if (queryParams) {
+      url.search = new URLSearchParams(queryParams).toString();
+    }
+
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (token) {
+      headers.Authorization = "Bearer" + token;
+    }
+
+    const res = await fetch(url.toString(), {
       method,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + token,
-      },
-      body: JSON.stringify(params),
+      headers,
+      body: JSON.stringify(body),
     });
     const data = await res.json();
-
     let returnValue: FetchReturn;
     if (res.ok) {
       if (data.status === "error") {

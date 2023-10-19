@@ -14,9 +14,18 @@ const Login = (props: any) => {
   const authRoot = document.querySelector<HTMLDivElement>("#modal-root")!;
 
   const loginClick = async () => {
-    const res = await fetchData("/login", "GET", { username, password });
-    if (res.ok) {
-      // do something
+    try {
+      const res = await fetchData("/login", "GET", undefined, undefined, {
+        username,
+        password,
+      });
+      if (res.ok) {
+        console.log(res);
+      } else {
+        console.log(res);
+      }
+    } catch (error) {
+      console.error("error");
     }
   };
 

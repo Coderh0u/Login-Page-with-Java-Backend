@@ -7,6 +7,7 @@ import javax.crypto.SecretKey;
 import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 // import org.springframework.web.bind.annotation.RequestBody;
@@ -25,6 +26,7 @@ import io.jsonwebtoken.Jwts;
 
 @RestController
 @RequestMapping
+@CrossOrigin(origins = "*")
 public class User {
   private final UsersRepo userRepo;
   private final RolesRepo rolesRepo;
